@@ -1,0 +1,12 @@
+## Macro title: Show number of drafts
+## Macro has a body: N
+## Body processing: No macro body
+## Installed by : PF
+## @noparams
+
+#set ($pageManager=$action.getPageManager())
+#set ($totalDrafts=$pageManager.countDraftPages() + $pageManager.countPagesWithUnpublishedChanges())
+
+<strong>New page drafts:</strong> $pageManager.countDraftPages()<br>
+<strong>Unpublished changes:</strong> $pageManager.countPagesWithUnpublishedChanges()<br>
+<strong>Total drafts:</strong> $totalDrafts

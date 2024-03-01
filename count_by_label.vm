@@ -1,0 +1,14 @@
+## Macro title: count_by_label
+## Macro has a body: Y or N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: PF
+## Date created: 15/02/2019
+## Installed by: PF
+
+## @param label:title=Label|type=string|required=true|desc=Enter a label to count.
+#set($labelManager=$containerContext.getComponent('labelManager'))
+
+$labelManager.getContentCount($labelManager.getLabel($paramlabel))
+

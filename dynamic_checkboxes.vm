@@ -1,0 +1,55 @@
+## Developed by: Davin Studer
+## Date created: 12/2/2014
+## @noparams
+
+#set ($containerManagerClass=$content.class.forName('com.atlassian.spring.container.ContainerManager'))
+#set ($getInstanceMethod=$containerManagerClass.getDeclaredMethod('getInstance',null))
+#set ($containerManager=$getInstanceMethod.invoke(null,null))
+#set ($containerContext=$containerManager.containerContext)
+#set ($contentPropertyManager=$containerContext.getComponent('contentPropertyManager'))
+#set ($d = '$')
+
+#if($req.getParameter('submit') == "true" && $req.getParameter('checkbox') && $req.getParameter('checkbox') != "")
+    #if($req.getParameter('value') && $req.getParameter('value') != "")
+        #set ($value = $req.getParameter('value'))
+    #else
+        #set ($value = "")
+    #end
+    $contentPropertyManager.setStringProperty($content, $req.getParameter('checkbox'), $value)
+#end
+ 
+#if ($body != "")
+    <form class="aui" id="dynCheckboxForm">
+    #foreach($box in $body.split(","))
+        #if($contentPropertyManager.getStringProperty($content, "dynCheckbox$box") == "checked")
+            #set($checked = 'checked="checked"')
+        #else
+            #set($checked = '')
+        #end
+        <div class="checkbox">
+            <input class="checkbox dynCheckbox" type="checkbox" name="dynCheckbox$box" id="dynCheckbox$box" $checked value="checked" />
+            <label for="dynCheckbox$box">$box</label>
+        </div>  
+    #end
+    </form>
+#end
+
+<script type="text/javascript">
+AJS.toInit(function(){
+    AJS.$('.dynCheckbox').click(function(){
+        AJS.${d}.ajax({
+            type: 'GET',
+			data: {
+                submit: 'true',
+                checkbox: AJS.$(this).attr('id'),
+                value: AJS.$(this).is(':checked') ? 'checked' : ''
+            },
+			url: "$content.getUrlPath()",
+			success: function(data) {
+			},
+			error: function() {
+			}
+        });
+    });
+});
+</script>

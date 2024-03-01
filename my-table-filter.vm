@@ -1,0 +1,45 @@
+## Macro Name: my-table-filter
+## Macro title: My Table Filter
+## Category: Confluence Content
+## Macro Body Processing: Rendered
+
+## @param FilterID:title=FilterID|type=string|required=true|desc=ID [a-z,A-Z,0-9]
+## @param Label:title=Label|type=string|required=true|desc=Label
+## @param Class:title=Length of the input field|type=enum|enumValues=short-field,medium-field,medium-long-field,long-field,full-width-field|default=long-field
+## @param ColumnNumber:title=Column Number|type=string|required=true|default=-1|desc=Specify the column number or "-1" for the entire row
+
+<form class="aui">
+    <div class="field-group">
+        <label for="searchInput$paramFilterID">$paramLabel</label>
+        <input class="text $paramClass" type="text" id="searchInput$paramFilterID">
+        <div class="description">Filter parameters</div>
+    </div>
+</form>
+
+<div id="tableFilter$paramFilterID">
+$body
+</div>
+
+<script type="text/javascript">
+    AJS.$("#searchInput$paramFilterID").keyup(function () {
+        var jqry = AJS.$
+        var rows = jqry("#tableFilter$paramFilterID tbody tr").hide();
+        var searchData = this.value;
+        if (searchData.length) {
+                var data = searchData.toLowerCase().split(" ");
+                jqry.each(data, function (search_idx, str) {
+                rows.filter(function(row) {
+                    var col_to_filter = $paramColumnNumber;
+                    if (col_to_filter>=0) {
+                        var td_to_filter = $(this).children("td").eq(parseInt(col_to_filter));
+                        return $(td_to_filter).text().toLowerCase().indexOf(data) >= 0;
+                    } else {
+                        return $(this).text().toLowerCase().indexOf(data) >= 0;
+                    }
+                }).show();
+                });
+        } else {
+            rows.show();
+        }
+    });
+</script>

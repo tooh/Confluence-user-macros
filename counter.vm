@@ -1,0 +1,4 @@
+## @param labels:title=Labels|type=string
+#foreach($label in $paramlabels.split(","))
+$labelManager.getContentCount($labelManager.getlabel($label)))
+#end

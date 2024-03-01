@@ -1,0 +1,77 @@
+## Developed by: Davin Studer
+## Date created: 05/31/2018
+
+## @param ID:title=Panel ID|type=string|required=false|desc=Optionally provide a unique id to surround the panel(s) (no spaces).
+## @param Start:title=Start Collapsed|type=boolean|required=false|desc=
+
+########################################################################
+## Use the given ID if present otherwise generate one. The reason for ##
+## this is so that we can target each user macro distinctly if this   ##
+## is included more than once per page.                               ##
+########################################################################
+#if( $paramID && $paramID != "" )
+    #set( $id = $paramID )
+#else
+    #set( $id = $action.dateFormatter.calendar.timeInMillis )
+#end
+
+#set( $expandText = "Expand panel" ) ## Change this to fit your desired verbiage/language
+#set( $collapseText = "Collapse panel" )  ## Change this to fit your desired verbiage/language
+
+<style type="text/css">
+########################################################################################
+## Below CDATA fixes issue with greather than and less than symbols being escaped out ##
+########################################################################################
+/*<![CDATA[*/
+    #collapser-$id .panel.collapser-closed .panelContent {display: none;}
+    #collapser-$id .panel.collapser-open .panelContent {display: block;}
+    .collapser {float: right; cursor: pointer; margin-right: 5px;}
+    .collapser-text {vertical-align: top; color: #3b73af;}
+    .collapser-text:hover {text-decoration: underline;}
+/*]]>*/
+</style>
+
+<script type="text/javascript">
+//<![CDATA[
+AJS.toInit(function(){
+    /////////////////////////////////////////////////////
+    // This block is a mix of Velocity and Javascript. //
+    // The Velocty variable will add Javascript to     //
+    // open or close the panel(s) within the macro     //
+    // depending upon what the user set.               //
+    /////////////////////////////////////////////////////
+#if ( $paramStart == true )
+    AJS.$('#collapser-$id .panel .panelHeader').append('<span class="collapser"><span class="collapser-button expand-control-icon icon">&nbsp;</span><span class="collapser-text">$expandText</span></span>');
+    AJS.$('#collapser-$id .panel').has('.panelHeader').addClass('collapser-closed');
+#else
+    AJS.$('#collapser-$id .panel .panelHeader').append('<span class="collapser"><span class="collapser-button expand-control-icon icon expanded">&nbsp;</span><span class="collapser-text">$collapseText</span></span>');
+    AJS.$('#collapser-$id .panel').has('.panelHeader').addClass('collapser-open');
+#end
+
+    AJS.$('#collapser-$id .panel .collapser').click(function() {
+        var panel = AJS.$(this).parent().parent(); // Get the panel for this specific collapser
+        var open = AJS.$(panel).hasClass('collapser-open'); // Is it currently open or closed?
+
+        if(open) {
+            toggleCollapser$id(panel, 'close');
+        } else {
+            toggleCollapser$id(panel, 'open');
+        }
+    });
+});
+
+function toggleCollapser$id(panel, action) {
+    if(action === "close") {
+        AJS.$(panel).removeClass('collapser-open').addClass('collapser-closed');
+        AJS.$('.collapser-button', panel).removeClass('expanded');
+        AJS.$('.collapser-text', panel).text('$expandText');
+    } else {
+        AJS.$(panel).removeClass('collapser-closed').addClass('collapser-open');
+        AJS.$('.collapser-button', panel).addClass('expanded');
+        AJS.$('.collapser-text', panel).text('$collapseText');
+    }
+}
+//]]>
+</script>
+
+<div id="collapser-$id">$body</div>

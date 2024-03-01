@@ -1,0 +1,11 @@
+## Macro title: CreateBlogPost
+## Macro has a body: N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: 
+## Date created: 9/12/2019
+## Installed by: PF
+
+## @param space:title=Space|type=spacekey
+<a href="/pages/createblogpost.action?spaceKey=$paramspace" class="aui-button aui-button-primary"><span>Create Blog Post</span></a>

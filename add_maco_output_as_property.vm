@@ -1,0 +1,21 @@
+## Macro title: Add macro output as property
+## Macro has a body: Y
+## Body processing: Convert macrooutput to page property. Visible in example bobswift's "run" macro as %property_varname%
+## Output: Variable
+##
+## Developed by: Lars Solberg
+## Date created: 25/01/2016
+## Installed by: Lars Solberg
+## @param Name:title=Name|type=string|required=true|desc=Name of property to create
+
+#set ($containerManagerClass=$content.class.forName('com.atlassian.spring.container.ContainerManager'))
+#set ($getInstanceMethod=$containerManagerClass.getDeclaredMethod('getInstance',null))
+#set ($containerManager=$getInstanceMethod.invoke(null,null))
+#set ($containerContext=$containerManager.containerContext)
+#set ($contentPropertyManager=$containerContext.getComponent('contentPropertyManager'))
+
+#if ($body) 
+$contentPropertyManager.setStringProperty($content, "$paramName", $body.trim())
+#else
+$contentPropertyManager.setStringProperty($content, "$paramName", "")
+#end

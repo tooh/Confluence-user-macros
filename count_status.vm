@@ -1,0 +1,25 @@
+## @noparams
+<table>
+  <tbody id="status-table">
+    <tr>
+      <th>Status</th>
+      <th>Count</th>
+    </tr>
+  </tbody>
+</table>
+<script>
+AJS.toInit(function() {
+  var statusTable = jQuery("#status-table");
+  var statusMacros = {};
+  jQuery(".status-macro").each(function() {
+    if (statusMacros.hasOwnProperty(this.outerHTML)) {
+      statusMacros[this.outerHTML] += 1;
+    } else {
+      statusMacros[this.outerHTML] = 1;
+    }
+  });
+  Object.keys(statusMacros).forEach(function(key) {
+    statusTable.append('<tr><td class="confluenceTd">' + key + '</td><td class="confluenceTd"><p>' + statusMacros[key] + '</p></td></tr>')
+  });
+});
+</script>

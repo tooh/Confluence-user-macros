@@ -1,0 +1,22 @@
+## Macro title: ISO header
+## Macro has a body: Y or N
+## Generates: HTML markup
+##
+## Developed by: Helma van der Linden
+## Date created: 2017-11-03
+## Installed by: Helma van der Linden
+
+## @param Version:title=Version|type=string|required=true|desc=Version of the page
+## @param NextRevision:title=Next Revision|type=date|required=true|desc=Date to revisit this page for update
+## @param Status:title=Status|type=enum|enumValues=Draft,Definitive|default=Draf|desc=Status of page
+
+<div>
+<table>
+<tr><th>Versie</th><td>$paramVersion.$content.version</td></tr>
+<tr><th>Originele Auteur</th><td>#usernameLink($content.creator.name)</td></tr>
+<tr><th>Revisie datum</th><td>$action.dateFormatter.formatDateTime($content.getLastModificationDate())</td></tr>
+<tr><th>Auteur revisie</th><td>#usernameLink($content.getLastModifierName())</td></tr>
+<tr><th>Status</th><td>$paramStatus</td></tr>
+<tr><th>Volgende revisie</th><td>$paramNextRevision</td></tr>
+</table>
+</div>

@@ -1,0 +1,37 @@
+## Macro title: Modified since
+## Macro has a body: Y or N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: My Name
+## Date created: dd/mm/yyyy
+## Installed by: My Name
+
+## @param DaysBack:title=Not Modified Within Last (x) Days|type=int|required=true|desc=Pages that have not been modified within the given amount of days.
+## @param SpaceKey:title=Restrict to this Space Key|type=string|required=false|desc=This is case-sensitive. If not specified, all accessible spaces are searched.
+
+#if($paramDaysBack && $paramDaysBack != "")
+##########################################################
+## Convert the parameter to an integer. Even though the ##
+## param type is int Confluence still treats as a ##
+## string. ##
+##########################################################
+#set($paramDaysBack = $generalUtil.convertToInteger("-$paramDaysBack"))
+
+##########################################################
+## Take today's date and subtract the days back number. ##
+##########################################################
+#set($cal = $action.dateFormatter.getCalendar())
+$cal.add(5, $paramDaysBack)
+#set($end = $action.dateFormatter.formatGivenString("yyyyMMdd", $cal.getTime()))
+
+##########################################################
+## Render the search macro with 19000101 as the start ##
+## date and our calculated back days as the end. ##
+##########################################################
+#if($paramSpaceKey && $paramSpaceKey != "")
+$action.getHelper().renderConfluenceMacro("{search:query=modified:[19000101 TO $end]|maxLimit=999999999|type=page|spacekey=$paramSpaceKey}")
+#else
+$action.getHelper().renderConfluenceMacro("{search:query=modified:[19000101 TO $end]|maxLimit=999999999|type=page}")
+#end
+#end

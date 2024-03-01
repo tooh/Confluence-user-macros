@@ -1,0 +1,16 @@
+## @noparams
+<ac:structured-macro ac:name="html">
+    <ac:plain-text-body><![CDATA[<span id="how-many-unchecked"></span>
+        <script type="text/javascript">
+            AJS.toInit(function() {
+			var count = AJS.$('li[data-inline-task-id]').not(".checked").length;
+ 				 if (count == 1) {
+                    AJS.$("#how-many-unchecked").text(count + " item remaining.");
+                } else  {
+                    AJS.$("#how-many-unchecked").text(count + " items remaining.");
+                }
+               
+            });
+        </script>]]>
+    </ac:plain-text-body>
+</ac:structured-macro>

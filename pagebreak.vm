@@ -1,0 +1,4 @@
+## Macro name: pagebreak
+## Has body: NO
+## Generates: HTML markup
+<p id="pagebreak" style="page-break-before:always;"></p>

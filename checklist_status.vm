@@ -1,0 +1,33 @@
+## @noparams
+## Macro title: My Macro
+## Macro has a body: Y or N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: My Name
+## Date created: dd/mm/yyyy
+## Installed by: PF
+
+<span id="checklist-status" class="aui-lozenge">To dos</span>
+ 
+<script type="text/javascript">
+(function ($) {
+    AJS.toInit(function() {
+        var checkList = $('#checklist-status');
+        var setStatus = function() {
+            var checked = $('li.checked').length;
+            if (checked == 18) {
+                checkList.removeClass('aui-lozenge-moved aui-lozenge-current').addClass('aui-lozenge-success').text('Completed');
+            } else if (checked > 0) {
+                checkList.removeClass('aui-lozenge-moved aui-lozenge-success').addClass('aui-lozenge-current').text('In Progress');
+            } else {
+                checkList.removeClass('aui-lozenge-current aui-lozenge-success').addClass('aui-lozenge-moved').text('To do');
+            }
+        };
+ 
+        setStatus();
+ 
+        AJS.bind("inline-tasks.status-update.complete", setStatus);
+    });
+})(AJS.$);
+</script>

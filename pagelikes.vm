@@ -1,0 +1,36 @@
+## Macro name: pagelikes
+## Visibility: Visible to all users in the Macro Browser
+## Macro title: Page Likes
+## Description: Returns the number of likes for a given page
+## Categories: Confluence content
+## Macro body processing: No macro body
+##
+## Developed by: Charles Hall
+## Date created: 27.04.2016
+## Installed by: Charles Hall
+## @param PageID:title=Page ID|type=int|required=false|desc=ID of page to count likes
+##
+## Check for page id parameter, otherwise use default of current page
+#if (!$paramPageID)
+#set ($paramPageID=$content.id)
+#end
+##
+#set( $containerManagerClass=$content.class.forName('com.atlassian.spring.container.ContainerManager') )
+#set( $getInstanceMethod=$containerManagerClass.getDeclaredMethod('getInstance',null) )
+#set( $containerManager=$getInstanceMethod.invoke(null,null) )
+#set( $containerContext=$containerManager.containerContext )
+#set( $pageManager=$containerContext.getComponent('pageManager') )
+#set( $likeManager=$containerContext.getComponent('likeManager') )
+##
+#set ($targetPage = $action.page)
+## Set up integer object to handle string conversion of page id
+#set($Integer = 0)
+##
+#if ($pageManager)
+#set ($targetPage = $pageManager.getPage($Integer.parseInt($paramPageID)))
+#end
+##
+#set($count = $likeManager.countLikes($targetPage))
+#if ($likeManager)
+<span class="likecount">$count</span>
+#end

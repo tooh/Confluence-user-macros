@@ -1,0 +1,82 @@
+## Macro title: UserProfileAttributes
+## Macro has a body: Y or N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: Stephan Deutsch
+## Date created: dd/mm/yyyy
+## Installed by: PF
+
+
+## @param User:title=Username|type=username|desc=Select username to display
+## @param Group:title=Group|type=string|desc=Enter group to display.
+#set ( $Integer = 0 )
+#set ( $userName = "" )
+#set ( $userName = $paramUser )
+#set ( $groupName = "" )
+#set ( $groupName = $paramGroup )
+#set ( $group = "" )
+#set ( $user = "" )
+#set ( $containerManagerClass = $content.class.forName('com.atlassian.spring.container.ContainerManager') )
+#set ( $getInstanceMethod = $containerManagerClass.getDeclaredMethod('getInstance',null) )
+#set ( $containerManager = $getInstanceMethod.invoke(null,null) )
+#set ( $containerContext = $containerManager.containerContext )
+#set ( $userDetailsManager = $containerContext.getComponent('userDetailsManager') )
+#if ( $userName != "" )
+  #if ( $Integer.parseInt($generalUtil.getBuildNumber()) > 4300 )
+    #set ( $user = $userAccessor.getUserByName($userName) )
+  #else
+    #set ( $user = $userAccessor.getUser($userName) )
+  #end
+  #if ( $user != "" )
+    #set ( $phone = $userDetailsManager.getStringProperty($user, "phone") )
+    ##set ( $im = $userDetailsManager.getStringProperty($user, "im") )
+    ##set ( $website = $userDetailsManager.getStringProperty($user, "website") )
+    #set ( $position = $userDetailsManager.getStringProperty($user, "position") )
+    #set ( $department = $userDetailsManager.getStringProperty($user, "department") )
+    ##set ( $location = $userDetailsManager.getStringProperty($user, "location") )
+    <p> #userLink($user) - $!phone
+<ac:link>
+<ri:page ri:content-title="Rol - $!position" />
+<ac:plain-text-link-body>
+ <![CDATA[Rol - $position]]>
+</ac:plain-text-link-body>
+</ac:link>  
+
+<ac:link>
+     <ri:page ri:content-title="Afdeling-$!department" ri:space-key="ISMS"/>
+   </ac:link>
+</p>
+  #else
+    <p> User $userName not found. </p>
+  #end
+#elseif ( $groupName != "" )
+  <p> Members in group ${groupName}: </p>
+  #set ( $group = $userAccessor.getGroup($groupName) )
+  #if ( $group != "" )
+    #set ( $members = $userAccessor.getMemberNames($group) )
+    #foreach ( $member in $members )
+      #if ( $Integer.parseInt($generalUtil.getBuildNumber()) > 4300 )
+        #set ( $user = $userAccessor.getUserByName($member) )
+      #else
+        #set ( $user = $userAccessor.getUser($member) )
+      #end
+      #set ( $phone = $userDetailsManager.getStringProperty($user, "phone") )
+      ##set ( $im = $userDetailsManager.getStringProperty($user, "im") )
+      ##set ( $website = $userDetailsManager.getStringProperty($user, "website") )
+      #set ( $position = $userDetailsManager.getStringProperty($user, "position") )
+      #set ( $department = $userDetailsManager.getStringProperty($user, "department") )
+      ##set ( $location = $userDetailsManager.getStringProperty($user, "location") )
+      <p> #userLink($user) - $!phone 
+      <ac:link>
+     <ri:page ri:content-title="Rol-$!position" ri:space-key="ISMS"/>
+   </ac:link>
+       <ac:link>
+     <ri:page ri:content-title="Afdeling-$!department" ri:space-key="ISMS"/>
+   </ac:link>
+$department $position</p>
+    #end
+  #else
+    <p> Group $groupName not found. </p>
+  #end
+#end

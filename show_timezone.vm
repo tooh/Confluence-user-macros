@@ -1,0 +1,30 @@
+## Macro title: My Macro
+## Macro has a body: Y or N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: My Name
+## Date created: dd/mm/yyyy
+## Installed by: My Name
+
+
+## @param Timezone:title=Time Zone|required=true|type=enum|enumValues=time.zone.user_time_zone,time.zone.HST,time.zone.AST,time.zone.America.Los.Angeles,time.zone.America.Denver,time.zone.America.Mazatlan,time.zone.America.Phoenix,time.zone.America.Belize,time.zone.America.Chicago,time.zone.America.Mexico.City,time.zone.America.Regina,time.zone.America.Bogota,time.zone.America.Indianapolis,time.zone.America.New.York,time.zone.America.Caracas,time.zone.America.Halifax,time.zone.America.Santiago,time.zone.America.St.Johns,time.zone.America.Buenos.Aires,time.zone.America.Godthab,time.zone.America.Sao.Paulo,time.zone.Atlantic.South.Georgia,time.zone.Atlantic.Azores,time.zone.Atlantic.Cape.Verde,time.zone.Africa.Casablanca,time.zone.Europe.Dublin,time.zone.GMT,time.zone.ECT,time.zone.Europe.Belgrade,time.zone.Europe.Berlin,time.zone.Europe.Paris,time.zone.Europe.Warsaw,time.zone.Africa.Cairo,time.zone.Africa.Harare,time.zone.Asia.Jerusalem,time.zone.Europe.Athens,time.zone.Europe.Bucharest,time.zone.Europe.Helsinki,time.zone.Africa.Nairobi,time.zone.Asia.Baghdad,time.zone.Asia.Kuwait,time.zone.Asia.Tehran,time.zone.Asia.Baku,time.zone.Asia.Muscat,time.zone.Europe.Moscow,time.zone.Asia.Kabul,time.zone.Asia.Karachi,time.zone.Asia.Calcutta,time.zone.Asia.Colombo,time.zone.Asia.Katmandu,time.zone.Asia.Almaty,time.zone.Asia.Dhaka,time.zone.Asia.Yekaterinburg,time.zone.Asia.Rangoon,time.zone.Asia.Bangkok,time.zone.Asia.Hong.Kong,time.zone.Asia.Krasnoyarsk,time.zone.Asia.Kuala.Lumpur,time.zone.Asia.Taipei,time.zone.Australia.Perth,time.zone.Asia.Irkutsk,time.zone.Asia.Seoul,time.zone.Asia.Tokyo,time.zone.Australia.Adelaide,time.zone.Australia.Darwin,time.zone.Asia.Yakutsk,time.zone.Australia.Brisbane,time.zone.Australia.Hobart,time.zone.Australia.Sydney,time.zone.Pacific.Guam,time.zone.Asia.Vladivostok,time.zone.Pacific.Noumea,time.zone.Pacific.Auckland,time.zone.Pacific.Fiji,time.zone.Pacific.Apia,time.zone.Pacific.Tongatapu
+
+#set ( $timezones = $action.dateFormatter.timeZone.sortedTimeZones )
+#set ( $selectedTimezone = $action.dateFormatter.timeZone.default.wrappedTimeZone )
+#foreach ( $timezone in $timezones )
+  #if ( $timezone == $paramTimezone )
+    #set ( $selectedTimezone = $timezone.wrappedTimeZone )
+  #end
+#end
+#set ( $calendar = $action.dateFormatter.calendar.getInstance($selectedTimezone) )
+#set ( $hour = $calendar.get(10) )
+#set ( $minute = $calendar.get(12) )
+#if ( $hour < 10 )
+  #set ( $hour = "0" + $hour )
+#end
+#if ( $minute < 10 )
+  #set ( $minute = "0" + $minute )
+#end
+<p>$selectedTimezone.getDisplayName(false, 0): $hour:$minute</p>
+

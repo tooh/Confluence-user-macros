@@ -1,0 +1,59 @@
+## List Users - Confluence User Macro
+
+##
+##   Produces a CSV of all members of the `confluence-users` group in Confluence
+##   Columns: user_key,username,display_name,email
+
+##
+
+## WARNING:
+
+##
+
+##   Use very sparingly as this *will* slow down large Confluence instances.
+
+##   Yes, it will try to print out 100,000 users if you have that many in the system
+
+##
+
+##   I generally remove this user macro after using once and add only when needed.
+
+##
+
+## @noparams
+
+
+#set($containerManagerClass = $action.class.forName('com.atlassian.spring.container.ContainerManager'))
+#set($getInstanceMethod = $containerManagerClass.getDeclaredMethod('getInstance',null))
+#set($containerManager = $getInstanceMethod.invoke(null,null))
+#set($containerContext = $containerManager.containerContext)
+#set($userAccessor = $containerManager.containerContext.getComponent('userAccessor'))
+#set($users = $userAccessor.getUsersWithConfluenceAccessAsList() ) ## This method is slow and deprecated
+
+## @see: https://docs.atlassian.com/confluence/latest/com/atlassian/confluence/user/UserAccessor.html#getUsersWithConfluenceAccessAsList()
+
+<h2>Users</h2>
+
+## Drop it in code macro styling
+
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+
+	<div>
+
+		<pre>
+
+			<code>user_key,username,display_name,email,department, position
+
+#foreach( $user in $users )
+
+${user.key},${user.name},${user.fullName},${user.email},${user.department},${user.position}
+
+#end
+
+			</code>
+
+		</pre>
+
+	</div>
+
+</div>

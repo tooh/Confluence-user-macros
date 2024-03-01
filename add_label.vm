@@ -1,0 +1,51 @@
+## Macro title: Add label
+## Macro has a body: Y or N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: My Name
+## Date created: dd/mm/yyyy
+## Installed by: PF
+
+## @noparams
+ 
+<script type="text/javascript">;
+
+AJS.toInit(function ($) { 
+
+//every label checkbox on the page
+jQuery(".custom_label_to_add").click(function(){
+
+//call the add label ajax request
+    jQuery.post(contextPath+"/json/addlabelactivity.action", {"entityIdString": "$content.id", "labelString": jQuery(this).val(), "atl_token": jQuery("#atlassian-token").attr("content") } ,function(){
+
+        alert("label added to page");
+    });
+
+});
+
+
+
+});
+
+
+
+</script>;
+
+ 
+#set($containerManagerClass=$action.class.forName('com.atlassian.spring.container.ContainerManager'))
+#set($getInstanceMethod=$containerManagerClass.getDeclaredMethod('getInstance',null))
+#set($containerManager=$getInstanceMethod.invoke(null,null))
+#set($containerContext=$containerManager.containerContext)
+  
+
+#set($labelManager=$containerContext.getComponent('labelManager')) 
+
+Popular Labels
+
+#foreach( $popularLabelResult in $labelManager.getMostPopularLabels() )
+<br>       
+<input type="checkbox" class="custom_label_to_add" value="$popularLabelResult.label.name"> $popularLabelResult.label.name
+ 
+
+#end

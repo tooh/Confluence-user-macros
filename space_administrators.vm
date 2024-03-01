@@ -1,0 +1,32 @@
+## Macro title: Space Administrators
+## Macro has a body: N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: Andrew Frayling
+## Modified by: Foogie Sim
+## Date created: 21/03/2012
+## Date modified: 1/05/2013
+## Installed by: PF
+## Macro to display a list of space administrators
+## @noparams
+#set($containerManagerClass = $content.class.forName('com.atlassian.spring.container.ContainerManager'))
+#set($getInstanceMethod = $containerManagerClass.getDeclaredMethod('getInstance',null))
+#set($containerManager = $getInstanceMethod.invoke(null,null))
+#set($containerContext = $containerManager.containerContext)
+#set($users = $userAccessor.getUsers())
+#set($spaces = $spaceManager.getAllSpaces())
+<table class="confluenceTable">
+  <tr>
+    <th class="confluenceTh">Space Administrator</th><th class="confluenceTh">Space</th>
+  </tr>
+#foreach($user in $users)
+#foreach($spacer in $spaces)
+#if ($permissionHelper.canAdminister($user, $spacer))
+    <tr>
+      <td class="confluenceTd">#usernameLink($user.name)</td><td class="confluenceTd"><a href="$req.contextPath/display/$spacer.key">$spacer.name</a></td>
+    </tr>
+  #end
+#end
+#end
+</table>

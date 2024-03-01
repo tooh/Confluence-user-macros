@@ -1,0 +1,18 @@
+## @noparams
+<ac:structured-macro ac:name="html">
+    <ac:plain-text-body><![CDATA[<span id="how-many-checked"></span>
+        <script type="text/javascript">
+            AJS.toInit(function() {
+                var count = AJS.$('li.checked').length;
+                if (count == 1) {
+                    AJS.$("#how-many-checked").text(count + " item checked.");
+                } else {
+                    AJS.$("#how-many-checked").text(count + " items checked.");
+                }
+            });
+        </script>]]>
+    </ac:plain-text-body>
+</ac:structured-macro>
+
+
+

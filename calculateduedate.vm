@@ -1,0 +1,22 @@
+## Macro title: CalculateDuedate
+## Macro has a body: Y or N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: My Name
+## Date created: dd/mm/yyyy
+## Installed by: My Name
+
+## @noparams
+ 
+<div class='result'></div>
+<script type="text/javascript">
+AJS.toInit(function(){
+var number1 = 2;
+var number2 = 5;
+var resultaat = number1 * number2;
+ 
+jQuery(".result").text(resultaat );
+
+});
+</script>

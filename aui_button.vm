@@ -1,0 +1,11 @@
+## Macro title: AUI Button
+## Installed by : PF
+## Origin : https://stiltsoft.com/blog/2014/03/atlassian-confluence-look-feel-tricks-creating-buttons/
+## Macro has a body: N
+## @param Title:title=Title|type=string|required=true
+## @param URL:title=URL|type=string|required=true
+<a href="$paramURL">
+    <button class="aui-button aui-button-primary">
+        $paramTitle
+    </button>
+</a>

@@ -1,0 +1,22 @@
+## Macro title: FaCircleNumber
+## Macro has a body: Y or N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: PF
+## Date created: 10/04/2019
+## Installed by: PF
+
+## @param Text:title=Text|type=string|required=true|desc=Text(or number) for circle
+## @param Colour:title=Favourite Colour|type=enum|enumValues=red,green,blue|default=red|desc=Choose your favourite colour
+
+
+<!-- Create an icon wrapped by the fa-stack class -->
+<span class="fa-stack">
+    <!-- The icon that will wrap the number -->
+    <span class="fa fa-circle-o fa-stack-2x"></span>
+    <!-- a strong element with the custom content, in this case a number -->
+    <strong class="fa-stack-1x">
+     $paramText         
+    </strong> 
+</span>

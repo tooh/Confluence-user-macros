@@ -1,0 +1,96 @@
+## Macro title: PDF CSS
+## Macro has a body: N
+## Body processing: No macro body
+## Output: HTML
+##
+## Developed by: Sam Hall
+## Date created: 13/05/2014
+## Installed by: PF
+## @noparams
+
+#set($debugStyles=false)
+
+#set($servletPath=$req.getServletPath())
+
+#if ($servletPath =="/spaces/flyingpdf/pdfpageexport.action")
+
+  #set($pageTitle=$content.getTitle())
+
+  #if ($debugStyles)
+    #set($debugBlue="background-color:cyan !important;")
+    #set($debugYellow="background-color:yellow !important;")
+    #set($debugRed="background-color:#FBB !important;")
+  #else
+    #set($debugBlue="")
+    #set($debugYellow="")
+    #set($debugRed="")
+  #end
+
+<div class="pdf-header">
+  <img width="300" height="100" align="left" src="data:image/gif;base64,R0lGODdhAQABAJEAAP///8zMzAAAAAAAACwAAAAAAQABAAECAkwBADs="/>
+  <span>$pageTitle</span>
+</div>
+
+<table class="pdf-footer">
+  <tr>
+    <td class="confluenceTd" colspan="2">Alleen voor intern gebruik</td>
+    <td class="confluenceTd" style="width: 120px;text-align:right"><p><span class="page-cnt"></span></p></td></tr>
+  <tr>
+    <td class="confluenceTd" style="border:none" colspan="3">
+      <div style="text-align: center;"><strong><span style="color: rgb(255,0,0);">Vertrouwelijk.</span></strong></div>
+    </td>
+  </tr>
+</table>
+
+<style>
+<!--
+
+@page { $debugRed
+  size: A4;
+  margin: 42mm 10mm 32mm 10mm; /* headers/footers seem to ignore margins */
+  padding: 0 !important; /* maintains sanity */
+  
+  /* Header Section */
+  @top-center { $debugYellow
+    content: element(runninglogo);
+    text-align:left;
+    padding-top: 10mm; /* otherwise doesn't respect top margin */
+    display: table-cell;
+    vertical-align: top;
+    overflow:visible;
+  }
+  
+  /* Footer Section */
+  @bottom-center { $debugYellow
+    content: element(runningfooter);
+    padding-bottom: 10mm; /* otherwise doesn't respect bottom margin */
+  }
+}
+
+/* Remove default page title header */
+div.pagetitle > h1 {
+  display: none;
+}
+
+div.pdf-header { $debugRed
+  position: running(runninglogo);
+}
+
+div.pdf-header > span { $debugBlue
+  line-height: 1.2;
+  font-family: ConfluenceInstalledFont, Helvetica, Arial, sans-serif;
+  font-size: 20pt;
+  font-weight:bold;
+}
+
+table.pdf-footer {
+  margin-left: 10mm;
+  position: running(runningfooter);
+}
+
+.page-cnt:before {
+  content: "Page " counter(page) " of " counter(pages);
+}
+-->
+</style>
+#end

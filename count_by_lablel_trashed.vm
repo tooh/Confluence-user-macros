@@ -1,0 +1,23 @@
+## Macro title: CountByLabelTrashed
+## Macro has a body: Y or N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: PF
+## Date created: 15/02/2019
+## Installed by: PF
+
+## @param Label:title=Label|type=string|required=true|desc=Enter a label to count.
+
+#set( $labelManager = $action.LabelManager )
+#set( $labRef = $labelManager.getLabel($paramLabel) )
+#set( $pages = $labelManager.getCurrentContentForLabel( $labRef) )
+
+#set ($tmpCount = 0)
+#foreach($page in $pages)
+     #if ($page.isTrashed() ) 
+          #set ($tmpCount=$tmpCount+1 )
+     #end
+#end
+
+$tmpCount

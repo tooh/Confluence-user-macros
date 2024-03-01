@@ -1,0 +1,42 @@
+## Macro Name: raci_cell_color
+## Macro title: raci_cell_color
+## Descripton: Colors cell based on RACI value
+## Category: Confluence Content
+## Macro Body Processing: No macro body
+## Developer: Peter Florijn
+## Date: 17.11.2019
+## Installed by: PF
+## @noparams
+
+  <style>
+   .responsible {
+    background-color: pink !important;
+    text-align: center !important;
+    color: red !important;
+  }
+  .accountable {
+    background-color: lightgreen !important;
+    text-align: center !important;
+    color: green !important;
+  }
+  .consulted {
+  background-color: lightyellow !important;
+    text-align: center !important;
+    color: gold !important;
+  }
+  .informed {
+    background-color: lightblue !important;
+    text-align: center !important;
+    color: blue !important;
+  }
+  </style>
+<script type="text/javascript">
+
+AJS.toInit(function()
+{ 
+AJS.$("td:contains('R')").filter(function(){return $(this).text() == 'R';}).addClass('responsible'); 
+AJS.$("td:contains('A')").filter(function(){return $(this).text() == 'A';}).addClass('accountable'); 
+AJS.$("td:contains('C')").filter(function(){return $(this).text() == 'C';}).addClass('consulted'); 
+AJS.$("td:contains('I')").filter(function(){return $(this).text() == 'I';}).addClass('informed'); 
+
+});

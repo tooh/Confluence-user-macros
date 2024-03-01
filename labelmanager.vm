@@ -1,0 +1,236 @@
+## Macro title: Label Management Tool
+## Body processing: N
+##
+## Developed by: Stephen Deutsch
+##
+## This macro will allow a user to change (rename/merge) or remove all labels with a particular name.
+## The default search is over all spaces, but it can be restricted to a particular space as well.
+
+## Copyright 2014 zanox AG
+## 
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+## 
+##     http://www.apache.org/licenses/LICENSE-2.0
+## 
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+
+## @param LimitResults:title=Limit Results|type=string|default=1000|desc=The maximum number of results to display at a time (default: 1000).
+## @param DefaultSpace:title=Default Space|type=spacekey|desc=This space will automatically show up in the "Restrict search to this Space" box.
+#set ( $containerManagerClass = $content.class.forName('com.atlassian.spring.container.ContainerManager') )
+#set ( $getInstanceMethod = $containerManagerClass.getDeclaredMethod('getInstance',null) )
+#set ( $containerManager = $getInstanceMethod.invoke(null,null) )
+#set ( $containerContext = $containerManager.containerContext )
+#set ( $pageManager = $containerContext.getComponent('pageManager') )
+#set ( $contentEntityManager = $containerContext.getComponent('contentEntityManager') )
+
+#set ( $requestCharacter = "?" )
+#if ( $content.getUrlPath().contains("?") )
+  #set ( $requestCharacter = "&" )
+#end
+
+#set ( $Integer = 0)
+#set ( $searchResultsNum = 0 )
+#set ( $cannotEditCount = 0 )
+#set ( $labelToSearchAction = "" )
+#set ( $spaceToSearchAction = "" )
+#set ( $labelToReplaceAction = "" )
+#set ( $removeLabelAction = "" )
+#set ( $maxLimit = 1000 )
+#set ( $maxLimit = $paramLimitResults )
+#set ( $labelToSearchAction = $generalUtil.urlDecode($req.getParameter('labelToSearch')) )
+#set ( $labelToSearchSubmit = $generalUtil.urlEncode($labelToSearchAction) )
+#set ( $labelToSearchDisplay = $labelToSearchAction.replace("'", "\'").replace('"', "&quot;") )
+#set ( $labelToSearchString = $labelToSearchAction.replace('"', ' ') )
+#set ( $spaceToSearchAction = $generalUtil.urlDecode($req.getParameter('spaceToSearch')) )
+#set ( $labelToReplaceAction = $generalUtil.urlDecode($req.getParameter('labelToReplace')) )
+#set ( $removeLabelAction = $req.getParameter('removeLabel') )
+#set ( $maxLimit = $Integer.parseInt($maxLimit) )
+
+#if ( !$permissionHelper.canEdit($action.remoteUser, $content) )
+  <p>You must have edit rights for this page in order to be able to use the label management tool.</p>
+#else
+  #if ( $labelToSearchAction == "" && $labelToReplaceAction == "" && $removeLabelAction == "" )
+    <div style="margin-bottom: 5px;"><span>Label to Change: </span><input id="label-search"></div><br />
+    <div>Optional - Restrict search to this Space: </div><div><input id="space-to-search" class="autocomplete-space" data-none-message="No results" data-template="{key}" value="$!{paramDefaultSpace}"></div><br />
+    <button class="aui-button" onclick="window.location = '$content.getUrlPath()' + '${requestCharacter}labelToSearch=' + encodeURIComponent(document.getElementById('label-search').value) + '&spaceToSearch=' + encodeURIComponent(document.getElementById('space-to-search').value)">Search Label</button>
+  #else
+    #set ( $inString = $action.getHelper().renderConfluenceMacro("{search:query=labelText:$!{labelToSearchString}|spacekey=${spaceToSearchAction}|maxLimit=$maxLimit}") )
+	#if ( $labelToReplaceAction != "" )
+      <p>Confluence has attempted to change label <span class="aui-label">$labelToSearchAction</span> to <span class="aui-label">$labelToReplaceAction</span> on the following pages/blogposts.</p><p>See status below:</p>
+    #elseif ( $removeLabelAction != "" )
+      <p>Confluence has attempted to remove label <span class="aui-label">$labelToSearchAction</span> on the following pages/blogposts.</p><p>See status below:</p>
+	#else
+	  <p>Label Searched: <span class="aui-label">$labelToSearchAction</span> 
+	  #if ( $spaceToSearchAction != "" )
+	    in space with key: $spaceToSearchAction
+	  #end
+	  </p>
+    #end
+    <table>
+      <tr>
+        <th>#</th>
+        <th>Page</th>
+        #if ( $labelToReplaceAction != "" || $removeLabelAction != "" )
+          <th>Status</th>
+          <th>Undo</th>
+        #else
+          <th>Editable</th>
+        #end
+      </tr>
+    #foreach ( $line in $inString.split("<span") )
+      #if ( $line.contains("icon icon") || $line.contains("icon aui-icon") )
+        #foreach ( $string in $line.split('"') )
+          #set ( $isLinkString = false )
+          #if ( $string.contains("/display/") )
+            #set ( $isLinkString = true )
+            #set ( $slashCount = $string.length() - $string.replace("/", "").length() )
+            #if ( $slashCount == 6 )
+              ## Then this must be a blog post!
+              #set ( $splitString = $string.split("/") )
+              #set ( $index = 0 )
+              #foreach ( $section in $splitString )
+                #set ( $index = $index + 1 )
+                #if ( $index == 3 )
+                  #set ( $spaceName = $section )
+                #end
+                #if ( $index == 4 )
+                  #set ( $year = $Integer.parseInt($section) )
+                #end
+                #if ( $index == 5 )
+                  #set ( $month = $Integer.parseInt($section) - 1 )
+                #end
+                #if ( $index == 6 )
+                  #set ( $day = $Integer.parseInt($section) )
+                #end
+                #if ( $index == 7 )
+                  #set ( $pageNameEncoded = $section )
+                  #set ( $pageName = $generalUtil.urlDecode($pageNameEncoded) )
+                #end
+              #end
+              #set ( $blogPostCalendarObject = $action.dateFormatter.getCalendar() )
+              $blogPostCalendarObject.set($year, $month, $day)
+              #set ( $labelPage = $pageManager.getBlogPost($spaceName, $pageName, $blogPostCalendarObject) )
+            #else
+              ## Otherwise it is a regular page
+              #set ( $splitString = $string.split("/") )
+              #set ( $index = 0 )
+              #foreach ( $section in $splitString )
+                #set ( $index = $index + 1 )
+                #if ( $index == 3 )
+                  #set ( $spaceName = $section )
+                #end
+                #if ( $index == 4 )
+                  #set ( $pageNameEncoded = $section )
+                  #set ( $pageName = $generalUtil.urlDecode($pageNameEncoded) )
+                #end
+              #end
+              #set ( $labelPage = $pageManager.getPage($spaceName, $pageName) )
+            #end
+            
+          #end
+          #if ( $string.contains("/pages/") )
+            #set ( $isLinkString = true )
+            #foreach ( $part in $string.split("=") )
+              #set ( $pageId = $part )
+            #end
+            #set ( $long = $generalUtil.getSystemStartupTime() )
+            #set ( $pageIdLong = $long.parseLong($pageId) )
+            #set ( $labelPage = $contentEntityManager.getById($pageIdLong) )
+            #set ( $pageName = $labelPage.getTitle() )
+          #end
+          #if ( $isLinkString )
+            #foreach ( $label in $labelPage.getLabels() )
+              #if ( $label == $labelToSearchAction )
+                #set ( $searchResultsNum = $searchResultsNum + 1 )
+                <tr>
+                <td>$searchResultsNum</td>
+                <td><a href="$string">$pageName</a></td>
+                #if ( $labelToReplaceAction != "" || $removeLabelAction == "true")
+                  <td>
+                    #if ( $permissionHelper.canEdit($action.remoteUser, $labelPage) )
+					  #set ( $removeStatus = $action.labelManager.removeLabel($labelPage, $label) )
+					#else
+					  #set ( $removeStatus = "" )
+					#end
+                    #if ( $removeStatus == 3 || $removeStatus == 4 )
+                      <span class="aui-lozenge aui-lozenge-success">$label removed</span>
+                    #else
+                      <span class="aui-lozenge aui-lozenge-error">$label not removed</span>
+                    #end
+                    #set ( $labelIdList = "" )
+                    #if ( $labelToReplaceAction != "" )
+					  #foreach ( $labelToReplace in $labelToReplaceAction.split(" ") )
+                        <br />
+                        #set ( $newLabel = $action.labelManager.getLabel($labelToReplace) )
+					    #if ( $permissionHelper.canEdit($action.remoteUser, $labelPage) )
+					      #set ( $addStatus = $action.labelManager.addLabel($labelPage, $newLabel) )
+					    #else
+					      #set ( $addStatus = "" )
+					    #end
+                        #if ( $addStatus == 1 || $addStatus == 2 )
+                          <span class="aui-lozenge aui-lozenge-success">$newLabel added</span>
+					  	#set ( $labelIdList = $labelIdList + $!newLabel.id + "," )
+					    #elseif ( $addStatus == 0 )
+					      <span class="aui-lozenge aui-lozenge-success">merged into $newLabel</span>
+                        #else
+                          <span class="aui-lozenge aui-lozenge-error">$newLabel not added</span>
+                        #end
+                        #set ( $suppressDisplay = $action.labelManager.removeLabel($content, $newLabel) )
+                      #end
+					#end
+                  </td>
+                  <td>
+                    #set ( $undoStringPre = "" )
+                    #set ( $undoStringPost = "" )
+					#if ( $labelIdList != "" )
+                      #foreach ( $labelId in $labelIdList.split(",") )
+                        #set ( $undoStringPre = $undoStringPre + "jQuery.post(contextPath+'/json/removelabelactivity.action', {'entityIdString': '$labelPage.id', 'labelIdString': '$labelId', 'atl_token': jQuery('#atlassian-token').attr('content') },function(){ " )
+                        #set ( $undoStringPost = $undoStringPost + " });" )
+                      #end
+					#end
+					#set ( $labelString = $label.toString().replace("'", "\'").replace('"', '&quot;') )
+                    #if ( $removeStatus != "" || $addStatus != "" )
+					  <button class="aui-button" onclick="AJS.$(this).attr('disabled',''); $undoStringPre jQuery.post(contextPath+'/json/addlabelactivity.action', {'entityIdString': '$labelPage.id', 'labelString': '$labelString', 'atl_token': jQuery('#atlassian-token').attr('content') } ,function(){ alert('Changed label(s) back'); }); $undoStringPost">Undo</button>
+					#end
+                  </td>
+                #else
+                  <td>
+                  #if ( $permissionHelper.canEdit($action.remoteUser, $labelPage) )
+                    <span class="aui-lozenge aui-lozenge-success">can edit</span>
+                  #else
+                    #set ( $cannotEditCount = $cannotEditCount + 1 )
+                    <span class="aui-lozenge aui-lozenge-error">cannot edit</span>
+                  #end
+                  </td>
+                #end
+                </tr>
+              #end
+            #end
+          #end
+        #end
+      #end
+    #end
+    #if ( $searchResultsNum == 0 )
+      <tr><td>0</td><td>No Results Found</td><td></td></tr>
+    #end
+    </table>
+    #if ( $labelToReplaceAction != "" || $removeLabelAction == "true" || $pagesToChangeNum == 0 )
+      <br />
+      <button class="aui-button" onclick="window.location = '$content.getUrlPath()'">Start Over</button>
+    #end
+    #set ( $pagesToChangeNum = $searchResultsNum - $cannotEditCount )
+    #if ( $labelToReplaceAction == "" && $removeLabelAction == "" && $pagesToChangeNum != 0 )
+      <p>By performing this action you will change the label <span class="aui-label">$labelToSearchAction</span> on $pagesToChangeNum pages/blogposts.</p><br />
+      <div style="margin-bottom: 5px;"><span>Change label <span class="aui-label">$labelToSearchAction</span> to: </span><input id="label-replace"></div>
+      <button class="aui-button" onclick="var replace_label = document.getElementById('label-replace').value.replace(/[!&@#^*()\?;:,.<>\[\]]/gi, ''); confirm('You are about to change the label $labelToSearchDisplay to ' + replace_label + '. You can only undo this action one-by-one.  Proceed?') ? jQuery.post(contextPath+'/json/addlabelactivity.action', {'entityIdString': '$content.id', 'labelString': document.getElementById('label-replace').value, 'atl_token': jQuery('#atlassian-token').attr('content') } ,function(){ window.location = '$content.getUrlPath()' + '${requestCharacter}labelToSearch=${labelToSearchSubmit}&spaceToSearch=${spaceToSearchAction}&labelToReplace=' + replace_label }) : undefined">Replace Label</button>
+      <button class="aui-button" onclick="confirm('You are about to remove the label ${labelToSearchDisplay}. You can only undo this action one-by-one.  Proceed?') ? window.location = '$content.getUrlPath()' + '${requestCharacter}labelToSearch=${labelToSearchSubmit}&spaceToSearch=&spaceToSearch=${spaceToSearchAction}&removeLabel=true' : undefined">Remove Label</button>
+      <button class="aui-button" onclick="window.history.back()">Start Over</button>
+    #end
+  #end
+#end

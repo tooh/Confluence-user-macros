@@ -1,0 +1,7 @@
+<script language="javascript">
+// Assign an anonymous function to the onload event
+window.onload = function(){
+// The time out value is set to be 120,000 milli-seconds
+setTimeout(' document.location=document.location' ,120000);
+}
+</script>

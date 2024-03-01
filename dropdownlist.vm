@@ -1,0 +1,88 @@
+## @param DropdownId:title=Unique dropdown ID|type=string|required=true|default=1|desc=If more than one dropdown in page, change this to a unique name.
+## @param Options:title=Options|type=string|required=true|desc=Enter desired dropdown options separated by a comma.
+## @param IncludeBlank:title=Include Blank Option|type=boolean
+## @param ShowColors:title=Show Colors|type=boolean|desc=If this option is selected, then blank dropdown = red, filled dropdown = green.
+## @param Label:title=Label|type=string|desc=Enter dropdown label, if desired
+#set ( $dropdownId = "1" )
+#set ( $dropdownId = $paramDropdownId )
+#set ( $dropdownId = "dropdown-" + $dropdownId )
+#set ( $options = "" )
+#set ( $options = $paramOptions )
+#set ( $label = "" )
+#set ( $label = $paramLabel )
+#set ( $toplabel = "" )
+#set ( $required = "" )
+#if ($paramShowColors == "true")
+  <style>
+    #$dropdownId { color:green }
+    #$dropdownId:invalid { color: red; }
+  </style>
+  #set ( $required = 'required="required"' )
+#end
+#if ( $label == "" )
+  #set ( $toplabel = "top-label" )
+#end
+#set ( $pageId = $content.id )
+<form class="aui $toplabel">
+  <div class="field-group">
+    #if ( $label != "" )
+      <label for="$dropdownId">$label</label>
+    #end
+    <select class="select" id="$dropdownId" name="$dropdownId" $required>
+    #if ($paramIncludeBlank == "true")
+      <option> </option>
+    #end
+    #foreach ( $option in $options.split(",") )
+      #set ( $option = $option.trim().replaceAll('"', '' ) ) 
+      <option value="$option">$option</option>
+    #end
+    </select>
+  </div>
+</form>
+<script>
+AJS.toInit(function() {
+  var canEdit = true;
+   
+  #if ( $permissionHelper.canEdit($userAccessor.getUserByName($req.remoteUser), $content) )
+  jQuery("#$dropdownId").change(function() {
+    var dropdownObject = this;
+    jQuery.ajax({
+      url: contextPath + "/rest/api/content/${pageId}/property/${dropdownId}",
+      success: function(dropdownData) {
+        dropdownData.value = jQuery(dropdownObject).val();
+        dropdownData.version.number += 1;
+        jQuery.ajax({
+          contentType: 'application/json',
+          type: 'PUT',
+          url: contextPath + "/rest/api/content/${pageId}/property/${dropdownId}",
+          data: JSON.stringify(dropdownData)
+        });
+      },
+      error: function(response) {
+        var dropdownData = {};
+        dropdownData.key = "$dropdownId";
+        dropdownData.value = jQuery(dropdownObject).val();
+        jQuery.ajax({
+          contentType: 'application/json',
+          type: 'POST',
+          url: contextPath + "/rest/api/content/${pageId}/property",
+          data: JSON.stringify(dropdownData)
+        });
+      }
+    });
+  });
+  #else
+    canEdit = false;
+  #end
+   
+  jQuery.ajax({
+    url: contextPath + "/rest/api/content/${pageId}/property/${dropdownId}",
+    success: function(dropdownData) {
+      jQuery("#$dropdownId").val(dropdownData.value);
+      if (!canEdit) {
+        jQuery("#$dropdownId").prop( "disabled", true );
+      }
+    }
+  });
+});
+</script>

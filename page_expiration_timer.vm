@@ -1,0 +1,108 @@
+## Aangepast op 02-05-2018 om automatisch het label verlopen toe te voegen
+
+## Macro title: Page Expiration Timer
+
+## Macro has a body: Y (can contain instructions to user in the event the doc is expired.)
+
+## Body processing: optionally display email address for author/editor and instructions.
+
+## Developed by: John Corwith, adapted from Femo Siegward Date Countdown macro
+
+## Date created: 07/12/2016
+
+## This user macro counts down the number of days until the page expiration date.
+
+## @param endDate:title=Page Expiration Date|type=date|required=true|desc=Format: mm/dd/yyyy
+
+## @param displayCountdown:title=Display Countdown Banner|type=boolean|default=true|desc=Permits the countdown banner to be hidden until the expiration date.
+
+## @param contentType:title=Page Content Type|type=string|required=true|desc=Page/Instructions/Asset/...
+
+## @param notifyText:title=Email Link Text|type=string|required=false|desc=Notify Administrator/Email/Report Expired Page/... (requires Email Address below)
+
+## @param email:title=Email Address|type=string|required=false|desc=DL or email address (requires Email Link Text above)
+
+ 
+
+## declare variables and initialize with current date
+
+#set ( $endDate = $content.currentDate)
+
+#set ( $currentDate = $content.currentDate)
+
+ 
+
+## parse endDate param to milliseconds and set as time of endDate variable
+
+$endDate.setTime($content.currentDate.parse($paramendDate))
+
+ 
+
+#if($currentDate.before($endDate))
+
+#if($paramdisplayCountdown == "true")
+
+## currentDate is before endDate => calculate days remaining
+
+#set ( $daysRemaining = ($endDate.getTime() - $currentDate.getTime()) / 1000 / 3600 / 24 )
+
+<div class="aui-message success">
+
+##<big><big>$paramcontentType revisie in $daysRemaining dagen op ##$action.dateFormatter.format($endDate).</big></big>
+
+<big><big>Over $daysRemaining dagen.</big></big>
+
+        <script>
+            AJS.toInit(function() {
+                jQuery.post(contextPath + "/json/removelabelactivity.action", {
+                    "entityIdString": "$content.id", 
+                    "labelIdString": "Verlopen", 
+                    "atl_token": jQuery("#atlassian-token").attr("content") 
+                });
+            });
+            AJS.toInit(function() {
+                jQuery.post(contextPath + "/json/addlabelactivity.action", {
+                    "entityIdString": "$content.id", 
+                    "labelString": "exp", 
+                    "atl_token": jQuery("#atlassian-token").attr("content") 
+                });
+             });
+        </script>
+
+</div>
+
+#end
+
+#else
+
+## currentDate is after endDate
+
+<div class="aui-message error">
+
+<big><big>$paramcontentType <strong><font color="red">Verlopen</font></strong> op $action.dateFormatter.format($endDate) revisie nodig.</big></big>
+
+        <script>
+            AJS.toInit(function() {
+                jQuery.post(contextPath + "/json/addlabelactivity.action", {
+                    "entityIdString": "$content.id", 
+                    "labelString": "Verlopen", 
+                    "atl_token": jQuery("#atlassian-token").attr("content") 
+                });
+            });
+        </script>
+
+#if($paramnotifyText)
+
+## optional link to email for concerning expired page
+
+<a href="mailto:$paramemail?subject=$renderContext.getPageTitle():$paramcontentType has EXPIRED&body=$action.getGlobalSettings().getBaseUrl()$content.geturlPath()">$paramnotifyTExt</a>
+
+#end
+
+## macro body can optional contain instructions for the user in the event the page has expired
+
+$body
+
+</div>
+
+#end

@@ -1,0 +1,46 @@
+## Macro title: ShowPropertyParent
+## Macro has a body: N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: PF
+## Date created: 21/10/2019
+## Installed by: PF
+## Remarks: properties with space in the name cause problems
+##  https://stackoverflow.com/questions/6802765/jquery-dealing-with-a-space-in-the-id-attribute
+## not allowing page properties with spaces in it solves it at the source, but you want labels with spaces
+## $prop.replace(" ", "")) solved it
+
+## @param PropertyName:title=Property|type=string|desc=Name of the page property of the parent page|Required=true
+
+#set ($parentID = $content.getParent().getIdAsString())
+
+#set ($prop = "$paramPropertyName")
+
+#set ($propid = $prop.replace(" ", ""))
+ 
+<div id="$propid"></div>
+
+<script type="text/javascript">
+
+jQuery.ajax({
+
+url: "/rest/masterdetail/1.0/detailssummary/lines?cql=id=$parentID&spaceKey=ISMS&headings=$prop&pageIndex=0",
+
+contentType: 'application/json',
+dataType: 'json',
+
+type: "GET",
+
+success: function(data){
+
+var props = data;
+
+property = props.detailLines[0].details[0];
+
+$("div[id=$propid]").html(property);
+
+    },
+    });
+
+</script> 

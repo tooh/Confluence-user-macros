@@ -1,0 +1,13 @@
+## Macro title: LabelAddedBy
+## Macro has a body: Y or N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: Stefan Deutsch
+## Date created: 03/01/2019
+## Installed by: PF
+
+## @noparams
+#foreach ( $labelling in $content.getLabellings() )
+  <p> $labelling.label.name added by $labelling.owningUser.name on $labelling.lastModificationDate </p>
+#end

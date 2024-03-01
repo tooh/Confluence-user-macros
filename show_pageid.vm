@@ -1,0 +1,8 @@
+## Macro title: getpageid
+## Macro has a body: N
+
+## @noparams
+
+$content.getIdAsString()
+
+

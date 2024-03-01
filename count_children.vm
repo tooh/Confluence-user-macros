@@ -1,0 +1,12 @@
+## @noparams
+## Macro title: My Macro
+## Macro has a body: Y or N
+
+#set($pageManager=$containerContext.getComponent('pageManager')) 
+#set($spacekey='ISMS')
+#set($pagetitle='Risk Assessment')
+
+#set($page=$pageManager.getPage($spacekey,$pagetitle))
+## $page.getChildren().size()
+
+$content.getChildren().size()

@@ -1,0 +1,24 @@
+## Macro title: Priority
+## Description
+## Setting project priority using status macro
+## Macro has a body: N
+## Body processing: Selected body processing option
+## Output: Selected output option
+## Developed by: Bill Bailey, MarketCom, LLC
+## Date created: 2019.01.12
+## Version: 1.1
+## Installed by: PF
+
+## @param Priority:title=Priority|type=enum|enumValues=Critical,High,Medium,Low
+
+## Set value pairs for status macro instances
+#set($priorityvalues = {"Critical" : "Red", "High" : "Yellow", "Medium" : "Green", "Low" : "Blue"})
+#set($priorityorder = {"Critical" : "1", "High" : "2", "Medium" : "3", "Low" : "4"})
+
+#set($priorityColor = $priorityvalues.get($paramPriority))
+<span  style="color:#FFFFFF;font-size:10px;margin-right:-5px;">$!priorityorder.get($paramPriority)
+<ac:structured-macro ac:name="status" ac:schema-version="1">
+  <ac:parameter ac:name="colour">$!priorityColor</ac:parameter>
+  <ac:parameter ac:name="title">$!paramPriority</ac:parameter>
+</ac:structured-macro>
+</span>

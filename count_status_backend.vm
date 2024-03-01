@@ -1,0 +1,38 @@
+## Macro title: My Macro
+## Macro has a body: N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: My Name
+## Date created: dd/mm/yyyy
+## Installed by: PF
+## @noparams
+#set ( $container = {} )
+#set( $contentBody = $content.bodyAsString )
+#foreach ( $part in $contentBody.split('(?=<ac:structured-macro)|(?<=\/ac:structured-macro>)') )
+  #if ( $part.contains('ac:name="status"') )
+    #set ( $status = $part.replaceAll(' ac:macro-id=".{36}"', '') )
+    #set ( $statusCount = false )
+    #set ( $statusCount = $container.get($status) )
+    #if ( $statusCount )
+      #set ( $statusCount = $statusCount + 1 )
+      #set ( $void = $container.put($status, $statusCount) )
+    #else
+      #set ( $void = $container.put($status, 1) )
+    #end
+  #end
+#end
+<table>
+  <tbody>
+    <tr>
+      <th>Status</th>
+      <th>Count</th>
+    </tr>
+    #foreach ( $status in $container.keySet() )
+      <tr>
+        <td>$status</td>
+        <td>$container.get($status)</td>
+      </tr>
+    #end
+  </tbody>
+</table>

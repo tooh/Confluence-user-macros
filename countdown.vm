@@ -1,0 +1,48 @@
+## Macro title: Date Countdown
+## Macro has a body: No
+## Body processing: No macro body
+##
+## Developed by: Remo Siegwart
+## Date created: 21/07/2012
+
+## This user macro counts down the number of days until a specific date
+## @param endDate:title=End Date|type=date|required=true|desc=The end date. Format: mm/dd/YYYY
+
+## declare variables and initialize as java date objects with current date
+#set ( $endDate = $content.currentDate )
+#set ( $currentDate = $content.currentDate )
+
+## parse endDate param to milliseconds and set as time of endDate variable
+$endDate.setTime($content.currentDate.parse($paramendDate))
+
+## now we have 2 valid java date objects to work with
+
+#if($currentDate.before($endDate))
+
+## currentDate is before endDate => calculate delta
+#set( $delta =  ($endDate.getTime() - $currentDate.getTime()))
+
+## calculate remaining days
+#set( $deltaDays = ($delta / (24 * 3600 * 1000)) )
+
+## calculate remaining hours
+#set( $deltaHours = ($delta % (24 * 3600 * 1000)) / (3600 * 1000) )
+
+## calculate remaining minutes
+#set( $deltaMinutes = (($delta % (24 * 3600 * 1000)) % (3600 * 1000) / (60 * 1000)) )
+
+## calculate remaining seconds
+#set( $deltaSeconds = (($delta % (24 * 3600 * 1000)) % (3600 * 1000) % (60 * 1000)) / (1000) )
+
+<div class="aui-message info shadowed">
+  <p>Countdown until <strong>$action.dateFormatter.format($endDate): $deltaDays days $deltaHours hours $deltaMinutes minutes $deltaSeconds seconds</strong></p>
+</div>
+
+#else
+
+## currentDate is after endDate
+<div class="aui-message success shadowed">
+  <p>Countdown to <strong>$action.dateFormatter.format($endDate)</strong> expired <strong>$generalUtil.getRelativeTime($endDate)</strong>!</p>
+</div>
+
+#end

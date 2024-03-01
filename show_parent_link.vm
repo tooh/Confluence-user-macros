@@ -1,0 +1,16 @@
+## Macro title: My Macro
+## Macro has a body: Y or N
+## Body processing: Selected body processing option
+## Output: Selected output option
+##
+## Developed by: My Name
+## Date created: dd/mm/yyyy
+## Installed by: PF
+
+## @noparams 
+#if (!$content.getParent()) <b>No parent page found</b> 
+#else #contentLink2($content.getParent() false false) 
+#end
+## for debug purposes:
+## $content.getParent()
+## $content.getParent().getIdAsString()

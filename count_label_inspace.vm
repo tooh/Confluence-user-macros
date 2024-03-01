@@ -1,0 +1,16 @@
+## Macro title: Count Labels
+## Macro has a body: N
+## Developed by: Jonathan Simonoff
+## Date created: 8/12/13
+## Installed by: Jonathan
+## To count labels
+## @param Label:title=Label|type=string|required=true|desc=The label to count
+## @param Spaces:title=Spaces|type=string|required=false|desc=These are case-sensitive. Separate each item with a comma or single space. Example: SPACEKEY,@personal.  Blank means all spaces. 
+#set($helper=$action.getHelper())
+#set($pages=$helper.renderConfluenceMacro("{contentbylabel:labels=$paramLabel|showLabels=false|max=99999999|spaces=$!paramSpaces}"))
+#set($pagelist=$pages.split("<li"))
+#set($count=-1)
+#foreach($page in $pagelist)
+ #set($count=$count+1)
+#end
+$count
